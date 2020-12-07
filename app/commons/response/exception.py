@@ -8,8 +8,9 @@
   
 -------------------------------------------------
 """
+from http.client import HTTPException
+
 from flask import request, json
-from werkzeug.exceptions import HTTPException
 
 
 class APIException(HTTPException):

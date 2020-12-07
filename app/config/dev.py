@@ -31,3 +31,11 @@ SIZE_DEFAULT = 10
 SQLALCHEMY_DATABASE_URI = 'mysql+cymysql://root:root@localhost:3306/test?charset=utf8'
 SQLALCHEMY_ENCODING = 'utf-8'
 SQLALCHEMY_TRACK_MODIFICATIONS = False  # 屏蔽 sql alchemy 的 FSADeprecationWarnin
+
+# Redis配置
+CACHE_SETTINGS = {
+    'PREFIX': 'flask::temp::',
+    'HOST': '127.0.0.1',
+    'PORT': 6379,
+    'db': 0
+}
