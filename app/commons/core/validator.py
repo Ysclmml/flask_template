@@ -35,10 +35,6 @@ class PropVelifyMixin(object):
     def isList(self, value):
         return True if isinstance(value, list) else False
 
-    # 判断空数组
-    def isEmptyList(self, value):
-        return True if self.isList(value) and len(value) == 0 else False
-
 
 class BaseValidator(PropVelifyMixin, WTForm):
     def __init__(self):

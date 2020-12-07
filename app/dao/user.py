@@ -30,7 +30,7 @@ class UserDao(object):
         user = User.query.filter_by(id=1).first()
         # print(list(user.info))
         info = Info.query.join(User).filter(User.id == 1)
-
+        Info.query.filter
         group = Group.query.filter(Group.id == 1).first()
         print('tttt', group.user)
         print(list(info))
@@ -46,3 +46,5 @@ class UserDao(object):
         print(Group.query.join(Group2User).with_entities(Group.id, Group.groupname).filter(Group2User.user_id == 1).values_list('id', flat=True))
         print(Group.query.join(Group2User).with_entities(Group.id, Group.groupname).filter(Group2User.user_id == 1).values_list('id'))
         return user
+
+

@@ -30,7 +30,6 @@ class RedPrint(object):
         def decorator(f):
             self.mound.append((f, rule, options))
             return f
-
         return decorator
 
     def register(self, bp, url_prefix=None):
