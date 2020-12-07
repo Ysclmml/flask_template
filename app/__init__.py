@@ -17,7 +17,6 @@ from sqlalchemy.exc import IntegrityError
 
 from app.api import api_v1, api_v2, register_blueprint
 from app.commons.core.db import db
-from app.commons.core.auth import load_endpint_infos, mount_route_meta_to_endpoint
 from app.commons.core.redprint import RedPrintAssigner
 from app.commons.response.error import APIException, ServerError, RepeatException
 from app.commons.core.logger import apply_request_log

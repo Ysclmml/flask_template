@@ -111,3 +111,5 @@ def mount_route_meta_to_endpoint(app):
         info = route_meta_infos.get(func.__name__ + str(func.__hash__()), None)
         if info:
             app.config['EP_META'].setdefault(endpoint, info)
+=======
+>>>>>>> a57a93c18d5daff1e19e63c3d839075be557ff85

@@ -9,3 +9,6 @@
 -------------------------------------------------
 """
 
+
+SECRET_KEY = 'abcdevadafdasfkljasdfjk'
+TOKEN_EXPIRE = 3600 * 7 * 24  # token过期时间, 当前为7天
