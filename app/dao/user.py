@@ -30,8 +30,10 @@ class UserDao(object):
         user = User.query.filter_by(id=1).first()
         # print(list(user.info))
         info = Info.query.join(User).filter(User.id == 1)
-
+        Info.query.filter
         group = Group.query.filter(Group.id == 1).first()
         print('tttt', group.user)
         print(list(info))
         return user
+
+
