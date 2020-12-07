@@ -8,7 +8,7 @@
   
 -------------------------------------------------
 """
-from http.client import HTTPException
+from werkzeug.exceptions import HTTPException
 
 from flask import request, json
 

@@ -9,7 +9,7 @@
 -------------------------------------------------
 """
 from sqlalchemy import Column, Integer, String, ForeignKey, BigInteger
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship
 
 from app.commons.core.db import EntityModel, BaseModel
 

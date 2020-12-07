@@ -55,6 +55,44 @@ class Query(BaseQuery):
 
     # todo: 这里可以为filter也加上额外的处理
 
+    def values_list(self, *col_names, flat=False):
+        """模仿django的values_list, 使用这个方法后直接执行了sql, 必须在结尾使用"""
+        res = list(self)
+        if len(res) == 0:
+            return []
+        ret = []
+        for r in res:
+            tmp = []
+            for idx, col in enumerate(col_names):
+                # 只取第一个字段
+                if flat:
+                    if isinstance(r, tuple):
+                        ret.append(r[0])
+                    else:
+                        ret.append(getattr(r, col))
+                    break
+                else:
+                    if isinstance(r, tuple):
+                        tmp.append(r[idx])
+                    else:
+                        tmp.append(getattr(r, col))
+            if not flat:
+                ret.append(tuple(tmp))
+        return ret
+
+    def values_dict(self, *col_names):
+        res = list(self)
+        ret = []
+        for r in res:
+            tmp = {}
+            for idx, col in enumerate(col_names):
+                if isinstance(r, tuple):
+                    tmp[col] = r[idx]
+                else:
+                    tmp[col] = getattr(r, col)
+            ret.append(tmp)
+        return ret
+
     def filter_by(self, **kwargs):
         if hasattr(self.statement.columns, 'delete_time') and 'delete_time' not in kwargs.keys():
             kwargs['delete_time'] = None

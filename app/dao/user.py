@@ -8,7 +8,7 @@
   
 -------------------------------------------------
 """
-from app.models.user import User, Info, Group
+from app.models.user import User, Info, Group, Group2User
 
 
 class UserDao(object):
@@ -34,4 +34,15 @@ class UserDao(object):
         group = Group.query.filter(Group.id == 1).first()
         print('tttt', group.user)
         print(list(info))
+        group2 = Group.query.with_entities(Group.id, Group.groupname).join(Group2User).filter(Group2User.user_id == 1)
+        print('部分字段1', group2, type(group2), list(group2))
+        group2 = Group.query.join(Group2User).filter(Group2User.user_id == 1)
+        print('部分字段2', group2, type(group2), list(group2))
+        print(Group.query.join(Group2User).filter(Group2User.user_id == 1).values_list('groupname', 'id'))
+        print(Group.query.join(Group2User).filter(Group2User.user_id == 1).values_list('groupname', flat=True))
+        print(Group.query.join(Group2User).filter(Group2User.user_id == 1).values_dict('groupname'))
+        print(Group.query.join(Group2User).filter(Group2User.user_id == 1).values_dict('groupname', 'id'))
+        print(Group.query.join(Group2User).with_entities(Group.id, Group.groupname).filter(Group2User.user_id == 1).values_dict('id', 'groupname'))
+        print(Group.query.join(Group2User).with_entities(Group.id, Group.groupname).filter(Group2User.user_id == 1).values_list('id', flat=True))
+        print(Group.query.join(Group2User).with_entities(Group.id, Group.groupname).filter(Group2User.user_id == 1).values_list('id'))
         return user
