@@ -9,94 +9,69 @@
 -------------------------------------------------
 """
 import json
+import os
 import time
-import re
-from functools import wraps
+from datetime import datetime
+from logging.config import dictConfig
 
-from flask import g, Response, request, _request_ctx_stack
-
-# from app.core.auth import find_info_by_ep
-# from app.models.user import User
-# from app.models.oper_log import OperLog
-# from app.models.login_log import LoginLog
-# from app.libs.enums import OperTyepEnum
-from app.commons.enums import OperTyepEnum
-
-REG_XP = r'[{](.*?)[}]'
-OBJECTS = ['user', 'response', 'request']
+from flask import g, request, _request_ctx_stack
 
 
-class Logger(object):
-    template = None  # 默认消息模版
-
-    def __init__(self, module='', template=None, type=OperTyepEnum.OTHER):
-        """
-        :param module: 红图模块(红图中文名)
-        :param template: 消息模版
-        :param type: 操作类型
-        """
-        if template:
-            self.template: str = template
-        elif self.template is None:
-            raise Exception('template must not be None!')
-
-        self.module = module
-        self.type = type.value if type in OperTyepEnum else OperTyepEnum.OTHER.value
-        self.message = ''
-        self.response = None
-        self.user = None
-
-    def __call__(self, func):
-        @wraps(func)
-        def wrap(*args, **kwargs):
-            response: Response = func(*args, **kwargs)
-            self.response = response
-            self.user = g.user
-            if not self.user:
-                raise Exception('Logger must be used in the login state')
-            self.message = self._parse_template()
-            self.write_log()
-            return response
-
-        return wrap
-
-    def write_log(self):
-        info = find_info_by_ep(request.endpoint)
-        auth = info.name if info is not None else ''
-        status_code = getattr(self.response, 'status_code', None)
-        if status_code is None:
-            status_code = getattr(self.response, 'code', None)
-        if status_code is None:
-            status_code = 0
-        request_param = {
-            'path': _request_ctx_stack.top.request.view_args,
-            'query': request.args,
-            'body': request.get_json() if request.get_json() else {}
+def logging_config():
+    # logging日志配置
+    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    logger_path = os.path.join(os.path.dirname(base_dir), 'logs')
+    logger_file = '{}_logs.log'.format(datetime.today().strftime('%Y-%m-%d'))
+    os.makedirs(logger_path, exist_ok=True)
+    full_logger_path = os.path.join(logger_path, logger_file)
+    logger_dict = {
+        'version': 1,  # 该配置写法固定
+        'formatters': {  # 设置输出格式
+            'default': {
+                'format': "[%(levelname)s] - %(asctime)s - %(name)s - : %(message)s in %(pathname)s:%(lineno)d", }
+        },
+        # 设置处理器
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+                # 'stream': 'ext://sys.stdout',
+                'formatter': 'default',
+                'level': 'INFO'
+            },
+            # 输出日志到文件，按日期滚动
+            'file': {
+                'level': 'INFO',
+                'class': 'logging.handlers.TimedRotatingFileHandler',
+                # TimedRotatingFileHandler的参数
+                # 参照https://docs.python.org/3/library/logging.handlers.html#timedrotatingfilehandler
+                # 目前设定每天一个日志文件
+                'filename': full_logger_path,
+                'when': 'midnight',
+                'interval': 1,
+                'backupCount': 10,
+                'formatter': 'default'
+            },
+        },
+        # 设置root日志对象配置
+        'root': {
+            'level': 'INFO',
+            'handlers': ['console', 'file']
+        },
+        # 设置其他日志对象配置
+        'loggers': {
+            'test': {
+                'level': 'DEBUG',
+                'handlers': ['console'],
+                'propagate': 0
+            },
+            'flask': {
+                'level': 'INFO',
+                'handlers': ['console', 'file'],
+                'propagate': 0
+            }
         }
-        OperLog.create(user_id=self.user.id, user_name=self.user.username,
-                       module=self.module, endpoint=request.endpoint, message=self.message,
-                       path=request.path, request_method=request.method, request_param=request_param,
-                       status_code=status_code,
-                       auth=auth, _type=self.type, commit=True)
-
-    # 解析自定义模板
-    def _parse_template(self):
-        message = self.template
-        total = re.findall(REG_XP, message)
-        for it in total:
-            assert '.' in it, '%s中必须包含 . ,且为一个' % it
-            i = it.rindex('.')
-            obj = it[:i]
-            assert obj in OBJECTS, '%s只能为user, response, request中的一个' % obj
-            prop = it[i + 1:]
-            if obj == 'user':
-                item = getattr(self.user, prop, '')
-            elif obj == 'response':
-                item = getattr(self.response, prop, '')
-            else:
-                item = getattr(request, prop, '')
-            message = message.replace('{%s}' % it, str(item))
-        return message
+    }
+    dictConfig(logger_dict)
 
 
 # 记录每次请求的性能
@@ -127,22 +102,6 @@ def apply_request_log(app):
             print(message)
         print('\033[0m')  # 终端颜色恢复
         return res
-
-
-# 记录用户的登录日志
-def record_login_log(uid, message=''):
-    """
-    :param uid: 用户id
-    :param msg: 提示消息
-    :return:
-    """
-    user = User.get_or_404(id=uid)
-    remote_addr, user_agent = request.remote_addr, request.user_agent
-    location = parse_location_by_ip(ip=remote_addr)
-
-    LoginLog.create(user_id=user.id, user_name=user.username,
-                    ip_addr=remote_addr, location=location, browser=user_agent.browser,
-                    os=user_agent.platform, message=message, status=True)
 
 
 # 基于ip解析真实地址

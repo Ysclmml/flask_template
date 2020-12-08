@@ -19,13 +19,17 @@ from app.api import api_v1, api_v2, register_blueprint
 from app.commons.core.db import db
 from app.commons.core.redprint import RedPrintAssigner
 from app.commons.response.error import APIException, ServerError, RepeatException
-from app.commons.core.logger import apply_request_log
+from app.commons.core.logger import apply_request_log, logging_config
+from logging.config import dictConfig
+
 # from app.extensions.api_docs.swagger import apply_swagger
 # from app.extensions.default_view import apply_default_view
 # from app.extensions.orm_admin import apply_orm_admin
 
 
 def create_app():
+    # 在项目创建之前加载日志
+    logging_config()
     app = Flask(__name__)
     load_config(app)
     register_blueprint(app)

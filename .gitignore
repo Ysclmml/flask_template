@@ -19,3 +19,4 @@ tmp/
 .env
 Pipfile.lock
 Pipfile.lock.back
+/**/logs

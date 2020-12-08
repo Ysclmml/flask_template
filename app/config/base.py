@@ -8,7 +8,13 @@
   
 -------------------------------------------------
 """
-
+import os
+from datetime import datetime
 
 SECRET_KEY = 'abcdevadafdasfkljasdfjk'
 TOKEN_EXPIRE = 3600 * 7 * 24  # token过期时间, 当前为7天
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+
+

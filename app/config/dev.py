@@ -10,7 +10,7 @@
 """
 
 DEBUG = True
-SQLALCHEMY_ECHO = True
+SQLALCHEMY_ECHO = False
 
 
 # 所有红图的路径
@@ -28,8 +28,8 @@ PAGE_DEFAULT = 1
 SIZE_DEFAULT = 10
 
 # MySQL 数据库配置
-# SQLALCHEMY_DATABASE_URI = 'mysql+cymysql://root:root@192.168.101.113:3306/zerd?charset=utf8'
-SQLALCHEMY_DATABASE_URI = 'mysql+cymysql://root:123456@47.102.148.156:3306/zerd?charset=utf8'
+SQLALCHEMY_DATABASE_URI = 'mysql+cymysql://root:root@192.168.101.113:3306/test?charset=utf8'
+# SQLALCHEMY_DATABASE_URI = 'mysql+cymysql://root:123456@47.102.148.156:3306/zerd?charset=utf8'
 SQLALCHEMY_ENCODING = 'utf-8'
 SQLALCHEMY_TRACK_MODIFICATIONS = False  # 屏蔽 sql alchemy 的 FSADeprecationWarnin
 
